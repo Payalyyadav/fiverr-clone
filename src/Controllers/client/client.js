@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const { executeTransaction } = require("../../utils/trycatchhandler");
+const customError = require("../../utils/error.handle");
 
 
 
@@ -302,15 +303,12 @@ const client = async (req, res) => {
             id: z.string().min(1, { message: "Client ID is required" })
         });
 
-
         const validationResult = idSchema.safeParse({ id: req.params.id });
 
         if (!validationResult.success) {
+                
 
-            return res.status(400).json({
-                status: "002",
-                message: validationResult.error.errors.map(err => err.message).join(", ")
-            });
+            throw new customError(validationResult.error.errors.map(err => err.message).join(", "), 400);
         }
 
         const clientID = req.params.id;
@@ -322,7 +320,8 @@ const client = async (req, res) => {
         }
 
         else {
-            return res.status(404).send({ status: "false", message: "client not found" });
+
+            throw new customError("client not found", 404);
         }
 
     } catch (error) {

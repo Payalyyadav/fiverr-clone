@@ -7,6 +7,11 @@ const ReviewSchema = new mongoose.Schema(
             max: 5
         },
 
+        comment: {
+            type: String,
+            required: true
+        },
+
         gig_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'gigs'
@@ -15,6 +20,11 @@ const ReviewSchema = new mongoose.Schema(
         client_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'buyers'
+        },
+
+        order_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'orders'
         }
     },
 

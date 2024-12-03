@@ -1,12 +1,8 @@
-
-
-class CustomError extends Error {
-    constructor(message, statusCode) {
+class customError extends Error {
+    constructor(message, Statuscode) {
         super(message);
-        this.statusCode = statusCode;
-        this.isOperational = true;  // A flag to indicate if the error is operational (user-defined)
-        Error.captureStackTrace(this, this.constructor);
+        this.Statuscode = Statuscode;
     }
 }
 
-module.exports = CustomError;
+module.exports = customError;
