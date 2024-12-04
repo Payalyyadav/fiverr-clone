@@ -5,15 +5,11 @@ const freelancerRouter = require('./src/routes/Freelancer.route');
 const reviewRouter = require('./src/routes/Review.route');
 const orderRouter = require('./src/routes/order.route');
 const serviceRouter = require('./src/routes/Service.route');
-
-
-
-
+const categoryRouter = require('./src/routes/Category');
+const subcategoryRouter = require('./src/routes/subcategory');
 
 
 const app = express();
-
-
 
 
 const PORT = 8080;
@@ -37,18 +33,13 @@ app.use("/freelancer", freelancerRouter);
 app.use ("/review",reviewRouter)
 app.use ("/order",orderRouter)
 app.use("/service", serviceRouter)
+app.use("/category", categoryRouter)
+app.use("/subcategory", subcategoryRouter)
 
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 })
-
-
-
-
-
-
-
 
 
 
