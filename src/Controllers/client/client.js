@@ -28,6 +28,7 @@ const register = async (req, res) => {
         })
     );
 
+    
     const validationSchema = z.object({
         name: capitalizeAndValidateName,
         number: z.preprocess((val) => {

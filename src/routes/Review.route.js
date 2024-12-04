@@ -3,9 +3,9 @@ const { addReview, fetchReviewbyGig, fetchReviewbyOrder, fetchReviewbyUser } = r
 
 const reviewRouter = express.Router();
 
-reviewRouter.post("/reviewadd", addReview)
-reviewRouter.get("/gig/:id", fetchReviewbyGig)
-reviewRouter.get("/order/:id", fetchReviewbyOrder )
-reviewRouter.get("/user/:id",fetchReviewbyUser)
+reviewRouter.post("/add", addReview)
+reviewRouter.get("/fetch-gig/:id", fetchReviewbyGig)
+reviewRouter.get("/fetchbyorder/:id", fetchReviewbyOrder )
+reviewRouter.get("/fetch_user/:id",fetchReviewbyUser)
 
 module.exports = reviewRouter;
