@@ -1,40 +1,38 @@
 const Ratting = require("../../Models/review.modal");
+const { executeTransaction } = require("../../utils/trycatchhandler");
+const mongoose = require("mongoose");
+const { z } = require("zod");
+
+
+
 
 const fetchReviewbyGig = async (req, res) => {
 
-    try {
 
-        const idSchema = z.object({
-            id: z.string().min(1, { message: "service ID is required" })
-        });
+    const idSchema = z.object({
+        id: z.string()
+            .length(24, "Invalid service id format")
+            .regex(/^[0-9a-fA-F]{24}$/, "Invalid service id format"),
+    });
 
 
-        const validationResult = idSchema.safeParse({ id: req.params.id });
+    const validationResult = idSchema.safeParse({ id: req.params.id });
 
-        if (!validationResult.success) {
+    if (!validationResult.success) {
 
-            return res.status(400).json({
-                status: "002",
-                message: validationResult.error.errors.map(err => err.message).join(", ")
-            });
-        }
+        throw new customError(validationResult.error.errors.map(err => err.message).join(", "), 400);
+    }
 
-        const gig_id = req.params.id;
+    const gig_id = req.params.id;
 
-        const review = await Ratting.findById({ _id: gig_id });
+    const review = await Ratting.findById({ _id: gig_id });
 
-        if (review) {
-            return res.send({ status: "001", reviews: review.ratting });
-        }
+    if (review) {
+        return res.send({ status: "001", reviews: review.ratting });
+    }
 
-        else {
-            return res.status(404).send({ status: "false", message: "service not found" });
-        }
-
-    } catch (error) {
-
-        console.log(error);
-        return res.status(500).send({ status: "error", message: "Internal Server Error" });
+    else {
+        throw new customError("service not found", 404);
     }
 };
 
@@ -43,39 +41,30 @@ const fetchReviewbyGig = async (req, res) => {
 
 const fetchReviewbyUser = async (req, res) => {
 
-    try {
+    const idSchema = z.object({
+        id: z.string()
+            .length(24, "Invalid user id format")
+            .regex(/^[0-9a-fA-F]{24}$/, "Invalid user id format"),
+    });
 
-        const idSchema = z.object({
-            id: z.string().min(1, { message: "user ID is required" })
-        });
 
+    const validationResult = idSchema.safeParse({ id: req.params.id });
 
-        const validationResult = idSchema.safeParse({ id: req.params.id });
+    if (!validationResult.success) {
 
-        if (!validationResult.success) {
+        throw new customError(validationResult.error.errors.map(err => err.message).join(", "), 400);
+    }
 
-            return res.status(400).json({
-                status: "002",
-                message: validationResult.error.errors.map(err => err.message).join(", ")
-            });
-        }
+    const userid = req.params.id;
 
-        const userid = req.params.id;
+    const review = await Ratting.findById({ _id: userid });
 
-        const review = await Ratting.findById({ _id: userid });
+    if (review) {
+        return res.send({ status: "001", reviews: review.ratting });
+    }
 
-        if (review) {
-            return res.send({ status: "001", reviews: review.ratting });
-        }
-
-        else {
-            return res.status(404).send({ status: "false", message: "service not found" });
-        }
-
-    } catch (error) {
-
-        console.log(error);
-        return res.status(500).send({ status: "error", message: "Internal Server Error" });
+    else {
+        throw new customError("service not found", 404);
     }
 };
 
@@ -83,107 +72,92 @@ const fetchReviewbyUser = async (req, res) => {
 
 const fetchReviewbyOrder = async (req, res) => {
 
-    try {
+    const idSchema = z.object({
+        id: z.string()
+            .length(24, "Invalid order id format")
+            .regex(/^[0-9a-fA-F]{24}$/, "Invalid order id format"),
+    });
 
-        const idSchema = z.object({
-            id: z.string().min(1, { message: "Order ID is required" })
-        });
 
+    const validationResult = idSchema.safeParse({ id: req.params.id });
 
-        const validationResult = idSchema.safeParse({ id: req.params.id });
+    if (!validationResult.success) {
 
-        if (!validationResult.success) {
-
-            return res.status(400).json({
-                status: "002",
-                message: validationResult.error.errors.map(err => err.message).join(", ")
-            });
-        }
-
-        const orderid = req.params.id;
-
-        const review = await Ratting.findById({ _id: orderid });
-
-        if (review) {
-            return res.send({ status: "001", reviews: review.ratting });
-        }
-
-        else {
-            return res.status(404).send({ status: "false", message: "service not found" });
-        }
-
-    } catch (error) {
-
-        console.log(error);
-        return res.status(500).send({ status: "error", message: "Internal Server Error" });
+        throw new customError(validationResult.error.errors.map(err => err.message).join(", "), 400);
     }
+
+    const orderid = req.params.id;
+
+    const review = await Ratting.findById({ _id: orderid });
+
+    if (review) {
+        return res.send({ status: "001", reviews: review.ratting });
+    }
+
+    else {
+        throw new customError("service not found", 404);
+    }
+
 };
 
 
 
 const addReview = async (req, res) => {
 
-    try {
+
+    const validationSchema = z.object({
+
+        userId: z.string().length(24, "Invalid CategoryId format").regex(/^[0-9a-fA-F]{24}$/, "Invalid CategoryId format"),
+
+        gigId: z.string().length(24, "Invalid CategoryId format").regex(/^[0-9a-fA-F]{24}$/, "Invalid CategoryId format"),
+
+        comment: z.string().min(5, "comment is required"),
+        ratting: z.preprocess((val) => {
+            const num = Number(val);
+            return isNaN(num) ? undefined : num;
+        }, z.number().min(1, 'ratting is required and must be a number')),
+
+
+    });
 
 
 
-        const validationSchema = z.object({
+    const validationResult = validationSchema.safeParse(req.body);
 
-            userId: z.string().length(24, "Invalid CategoryId format").regex(/^[0-9a-fA-F]{24}$/, "Invalid CategoryId format"),
+    if (!validationResult.success) {
 
-            gigId: z.string().length(24, "Invalid CategoryId format").regex(/^[0-9a-fA-F]{24}$/, "Invalid CategoryId format"),
-
-            comment: z.string().min(5, "comment is required"),
-            ratting: z.preprocess((val) => {
-                const num = Number(val);
-                return isNaN(num) ? undefined : num;
-            }, z.number().min(1, 'ratting is required and must be a number')),
-
-
-        });
-
-
-
-        const validationResult = validationSchema.safeParse(req.body);
-
-        if (!validationResult.success) {
-
-            return res.status(400).json({
-                status: "002",
-                message: validationResult.error.errors.map(err => err.message).join(", ")
-            });
-        }
-
-
-        const { gigId, comment, ratting, userId } = req.body;
-
-
-        if (!mongoose.Types.ObjectId.isValid(gigId)) {
-            return res.status(400).json({ message: 'Invalid gig ID' });
-        }
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ message: 'Invalid user ID' });
-        }
-
-
-
-        await Ratting.create({
-            gig_id: gigId,
-            client_id: userId,
-            comment,
-            ratting
-        });
-
-        return res.status(201).json({ status: "001", msg: "Ratting  successfully" });
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ status: "error", message: 'Internal Server error' });
+        throw new customError(validationResult.error.errors.map(err => err.message).join(", "), 400);
     }
+
+
+    const { gigId, comment, ratting, userId } = req.body;
+
+
+    if (!mongoose.Types.ObjectId.isValid(gigId)) {
+        throw new customError('Invalid gig ID', 400);
+    }
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new customError('Invalid user ID', 400);
+    }
+
+
+
+    await Ratting.create({
+        gig_id: gigId,
+        client_id: userId,
+        comment,
+        ratting
+    });
+
+    return res.status(201).json({ status: "001", msg: "Ratting  successfully" });
+
 }
 
 
-
+executeTransaction(fetchReviewbyUser)
+executeTransaction(addReview)
+executeTransaction(fetchReviewbyOrder)
+executeTransaction(fetchReviewbyGig)
 
 
 module.exports = { fetchReviewbyGig, fetchReviewbyOrder, fetchReviewbyUser, addReview };
