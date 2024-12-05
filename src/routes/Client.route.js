@@ -7,10 +7,10 @@ const clientRouter = express.Router();
 clientRouter.post("/register", register)
 clientRouter.post("/login", login)
 clientRouter.get("/fetch", verification, clients)
-clientRouter.get("/fetch/by/:id", verification, client)
+clientRouter.get("/fetchby/:id", verification, client)
 clientRouter.post("/logout", verification, logout)
 clientRouter.post("/edit-detail", verification, edit_details)
-clientRouter.delete("/delete", verification, clientDelete)
+clientRouter.delete("/delete/:id", verification, clientDelete)
 clientRouter.put("/password-reset", verification, resetPassword)
 clientRouter.put("/password-change", verification, changePassword)
 

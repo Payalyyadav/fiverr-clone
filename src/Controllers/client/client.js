@@ -49,10 +49,12 @@ const register = async (req, res) => {
 
     const { name, number, email, password, category_id } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(category_id)) {
-
-        throw new customError('Invalid Category ID', 400);
-    }
+    for(let i = 0; i < category_id.length; i++) {
+        if (!mongoose.Types.ObjectId.isValid(category_id[i])) {
+    
+            throw new customError('Invalid Category ID', 400);
+        }
+       }
 
     const exists = await Client.findOne({ email });
 
@@ -181,7 +183,7 @@ const edit_details = async (req, res) => {
     );
 
     const validationSchema = z.object({
-        client_id: z.array(z.string().length(24, "Invalid Client ID format").regex(/^[0-9a-fA-F]{24}$/, "Invalid Client Id format")),
+        client_id: z.string().length(24, "Invalid Client ID format").regex(/^[0-9a-fA-F]{24}$/, "Invalid Client Id format"),
         name: capitalizeAndValidateName,
 
         number: z.preprocess((val) => {

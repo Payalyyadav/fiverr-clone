@@ -21,10 +21,12 @@ const ClientSchema = new mongoose.Schema(
             type: Number
         },
 
-        category_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'categories'
-        },
+        category_id:[
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'categories'
+            }
+        ],
 
         orders: [
             {
