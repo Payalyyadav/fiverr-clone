@@ -18,7 +18,7 @@ const GigSchema = new mongoose.Schema(
         },
 
         price:{
-            type: String,
+            type: Number,
             required: true
         },
 
@@ -27,12 +27,10 @@ const GigSchema = new mongoose.Schema(
             ref: 'sellers'
         },
 
-        category: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'categories'
-            }
-        ],
+        category:  {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'categories'
+        },
 
         sub_category: [
             {

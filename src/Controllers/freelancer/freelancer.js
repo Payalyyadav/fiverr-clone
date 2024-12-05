@@ -54,10 +54,12 @@ const register = async (req, res) => {
     const { name, about, location, skills, email, password, category_id } = req.body;
 
 
-    if (!mongoose.Types.ObjectId.isValid(category_id)) {
+   for(let i = 0; i < category_id.length; i++) {
+    if (!mongoose.Types.ObjectId.isValid(category_id[i])) {
 
         throw new customError('Invalid Category ID', 400);
     }
+   }
 
     const exists = await Freelancer.findOne({ email });
 
@@ -74,7 +76,7 @@ const register = async (req, res) => {
         about,
         password: hashedPassword,
         email,
-        category_id
+        category: category_id
     });
 
     return res.status(201).json({ status: "001", msg: "Freelancer registered successfully" });
@@ -180,7 +182,7 @@ const edit_details = async (req, res) => {
     );
 
     const validationSchema = z.object({
-        freelnacer_id: z.array(z.string().length(24, "Invalid Freelancer ID format").regex(/^[0-9a-fA-F]{24}$/, "Invalid Freelancer Id format")),
+        freelnacer_id: z.string().length(24, "Invalid Freelancer ID format").regex(/^[0-9a-fA-F]{24}$/, "Invalid Freelancer Id format"),
         name: capitalizeAndValidateName,
         email: z.string().email("Invalid email format"),
         password: z.string().min(4, "Password is required"),
@@ -207,6 +209,13 @@ const edit_details = async (req, res) => {
 
         throw new customError('Invalid Freelancer ID', 400);
     }
+
+    for(let i = 0; i < category_id.length; i++) {
+        if (!mongoose.Types.ObjectId.isValid(category_id[i])) {
+    
+            throw new customError('Invalid Category ID', 400);
+        }
+       }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 

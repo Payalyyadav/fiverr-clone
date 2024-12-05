@@ -2,10 +2,12 @@ const Service = require("../../Models/service_gig.modal");
 const mongoose = require("mongoose");
 const customError = require("../../utils/error.handle");
 const { executeTransaction } = require("../../utils/trycatchhandler");
-const {z} = require("zod");
+const { z } = require("zod");
 
 
 const addService = async (req, res) => {
+
+
     const validationSchema = z.object({
         freelancer_id: z.string()
             .length(24, "Invalid freelancer_id format")
@@ -22,9 +24,14 @@ const addService = async (req, res) => {
             .min(10, "Description is required and must be at least 10 characters"),
         about: z.string()
             .min(10, "About field is required and must be at least 10 characters"),
-        price: z.number()
-            .positive("Price must be a positive number"),
-        delivery_date: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid delivery_date format"),
+        price: z.preprocess((val) => {
+            const num = Number(val);
+            return isNaN(num) ? undefined : num;
+        }, z.number().min(1, 'Price is required and must be a number')),
+        delivery_date: z.preprocess((val) => {
+            const num = Number(val);
+            return isNaN(num) ? undefined : num;
+        }, z.number().min(1, 'date is required and must be a number')),
     });
 
 
@@ -39,6 +46,8 @@ const addService = async (req, res) => {
     const {
         freelancer_id, name, category, sub_category, description, about, price, delivery_date
     } = req.body;
+
+
 
 
     if (!mongoose.Types.ObjectId.isValid(freelancer_id)) {
@@ -121,9 +130,14 @@ const serviceUpdate = async (req, res) => {
             .min(10, "Description is required and must be at least 10 characters"),
         about: z.string()
             .min(10, "About field is required and must be at least 10 characters"),
-        price: z.number()
-            .positive("Price must be a positive number"),
-        delivery_date: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid delivery_date format"),
+        price: z.preprocess((val) => {
+            const num = Number(val);
+            return isNaN(num) ? undefined : num;
+        }, z.number().min(1, 'Price is required and must be a number')),
+        delivery_date: z.preprocess((val) => {
+            const num = Number(val);
+            return isNaN(num) ? undefined : num;
+        }, z.number().min(1, 'date is required and must be a number')),
     });
 
     const validationResult = validationSchema.safeParse(req.body);
@@ -165,7 +179,7 @@ const serviceUpdate = async (req, res) => {
         return res.status(200).json({
             status: "001",
             message: "Service  has been updated",
-            data: result
+
         });
     }
 
@@ -232,7 +246,7 @@ const fetchserviceByCategory_id = async (req, res) => {
 
     const category_id = req.params.id;
 
-    const service = await Service.findById({ _id: category_id });
+    const service = await Service.find({ category: category_id });
 
     if (service) {
         return res.send({ status: "001", service });
@@ -247,23 +261,53 @@ const fetchserviceByCategory_id = async (req, res) => {
 
 
 const servicesfetchbykeyword = async (req, res) => {
+
+
+    const idSchema = z.object({
+        category: z.string().length(24, "Invalid category ID format").regex(/^[0-9a-fA-F]{24}$/, "Invalid category Id format").optional(),
+        sub_category: z.string().length(24, "Invalid sub_category ID format").regex(/^[0-9a-fA-F]{24}$/, "Invalid sub_category Id format").optional()
+    });
+
+
+    const validationResult = idSchema.safeParse({ category_id: req.params.id });
+
+    if (!validationResult.success) {
+
+
+        throw new customError(validationResult.error.errors.map(err => err.message).join(", "), 400);
+    }
+
     const { ratting, sub_category, category, price, name } = req.query;
+
+
+
+
     const filter = {};
 
     if (name) {
         filter.name = { $regex: name, $options: "i" };
     }
     if (price) {
-        filter.price = { $regex: price, $options: "i" };
+        filter.price = Number(price);
     }
-    if (category) {
-        filter.category = { $regex: category, $options: "i" };
+    try {
+        if (category) {
+            filter.category = new mongoose.Types.ObjectId(category);
+        }
+    } catch (err) {
+
+        throw new customError("Invalid category ID format", 400);
     }
-    if (sub_category) {
-        filter.sub_category = { $regex: sub_category, $options: "i" };
+    try {
+        if (sub_category) {
+            filter.sub_category = new mongoose.Types.ObjectId(sub_category);
+        }
+    } catch (err) {
+
+        throw new customError("Invalid sub_category ID format", 400);
     }
     if (ratting) {
-        filter.ratting = { $regex: ratting, $options: "i" };
+        filter.ratting = Number(ratting);
     }
 
     const services = await Service.find(filter);
@@ -286,4 +330,6 @@ executeTransaction(servicesfetchbykeyword)
 
 
 module.exports = { servicesfetchbykeyword, fetchserviceByCategory_id, allservices, serviceDelete, serviceUpdate, fetchservicebyGig, addService }
+
+// z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid delivery_date format")
 

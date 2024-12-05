@@ -24,7 +24,7 @@ const add = async (req, res) => {
     
     const validationSchema = z.object({
         name: capitalizeAndValidateName,
-        category_id: z.array(z.string().length(24, 'Invalid CategoryId format').regex(/^[0-9a-fA-F]{24}$/, 'Invalid CategoryId format')),
+        category_id: z.string().length(24, 'Invalid CategoryId format').regex(/^[0-9a-fA-F]{24}$/, 'Invalid CategoryId format'),
         description: z.string().min(5, 'description is required'),
        
     });
