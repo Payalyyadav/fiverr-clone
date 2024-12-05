@@ -25,10 +25,10 @@ const fetchReviewbyGig = async (req, res) => {
 
     const gig_id = req.params.id;
 
-    const review = await Ratting.findById({ _id: gig_id });
+    const review = await Ratting.find({ gig_id: gig_id });
 
     if (review) {
-        return res.send({ status: "001", reviews: review.ratting });
+        return res.send({ status: "001", review });
     }
 
     else {
@@ -57,10 +57,10 @@ const fetchReviewbyUser = async (req, res) => {
 
     const userid = req.params.id;
 
-    const review = await Ratting.findById({ _id: userid });
+    const review = await Ratting.find({ client_id: userid });
 
     if (review) {
-        return res.send({ status: "001", reviews: review.ratting });
+        return res.send({ status: "001", review});
     }
 
     else {
@@ -88,10 +88,10 @@ const fetchReviewbyOrder = async (req, res) => {
 
     const orderid = req.params.id;
 
-    const review = await Ratting.findById({ _id: orderid });
+    const review = await Ratting.find({ order_id: orderid });
 
     if (review) {
-        return res.send({ status: "001", reviews: review.ratting });
+        return res.send({ status: "001", review });
     }
 
     else {
@@ -107,9 +107,10 @@ const addReview = async (req, res) => {
 
     const validationSchema = z.object({
 
-        userId: z.string().length(24, "Invalid CategoryId format").regex(/^[0-9a-fA-F]{24}$/, "Invalid CategoryId format"),
+        userId: z.string().length(24, "Invalid user id format").regex(/^[0-9a-fA-F]{24}$/, "Invalid user id format"),
+        order_id: z.string().length(24, "Invalid order_id format").regex(/^[0-9a-fA-F]{24}$/, "Invalid order_id format"),
 
-        gigId: z.string().length(24, "Invalid CategoryId format").regex(/^[0-9a-fA-F]{24}$/, "Invalid CategoryId format"),
+        gigId: z.string().length(24, "Invalid service id format").regex(/^[0-9a-fA-F]{24}$/, "Invalid service id format"),
 
         comment: z.string().min(5, "comment is required"),
         ratting: z.preprocess((val) => {
@@ -130,9 +131,12 @@ const addReview = async (req, res) => {
     }
 
 
-    const { gigId, comment, ratting, userId } = req.body;
+    const { gigId, comment, ratting, userId, order_id } = req.body;
 
 
+    if (!mongoose.Types.ObjectId.isValid(order_id)) {
+        throw new customError('Invalid order ID', 400);
+    }
     if (!mongoose.Types.ObjectId.isValid(gigId)) {
         throw new customError('Invalid gig ID', 400);
     }
@@ -146,7 +150,8 @@ const addReview = async (req, res) => {
         gig_id: gigId,
         client_id: userId,
         comment,
-        ratting
+        ratting,
+        order_id
     });
 
     return res.status(201).json({ status: "001", msg: "Ratting  successfully" });
