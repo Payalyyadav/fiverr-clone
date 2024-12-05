@@ -16,8 +16,8 @@ const addOrder = async (req, res) => {
             return isNaN(num) ? undefined : num;
         }, z.number().min(1, 'Quantity is required and must be a number')),
 
-        client_id: z.array(z.string().length(24, 'Invalid order Id format').regex(/^[0-9a-fA-F]{24}$/, 'Invalid order Id format')),
-        gig_id: z.array(z.string().length(24, 'Invalid gig Id format').regex(/^[0-9a-fA-F]{24}$/, 'Invalid gig Id format'))
+        client_id: z.string().length(24, 'Invalid order Id format').regex(/^[0-9a-fA-F]{24}$/, 'Invalid order Id format'),
+        gig_id: z.string().length(24, 'Invalid gig Id format').regex(/^[0-9a-fA-F]{24}$/, 'Invalid gig Id format')
     });
 
     const validationResult = validationSchema.safeParse(req.body);
@@ -101,7 +101,7 @@ const orderByClientid = async (req, res) => {
 
     const client_id = req.params.id;
 
-    const order = await Order.findById({ _id: client_id });
+    const order = await Order.find({ client_id: client_id });
 
     if (order) {
         return res.send({ status: "001", order });
@@ -142,6 +142,7 @@ const orderDelete = async (req, res) => {
 
 };
 
+
 const fetchByServiceId = async (req, res) => {
 
     const idSchema = z.object({
@@ -159,7 +160,7 @@ const fetchByServiceId = async (req, res) => {
 
     const service_id = req.params.id;
 
-    const order = await Order.findById({ _id: service_id });
+    const order = await Order.find({ gig_id: service_id });
 
     if (order) {
         return res.send({ status: "001", order });
