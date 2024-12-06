@@ -7,6 +7,9 @@ const orderRouter = require('./src/routes/order.route');
 const serviceRouter = require('./src/routes/Service.route');
 const categoryRouter = require('./src/routes/Category');
 const subcategoryRouter = require('./src/routes/subcategory');
+const inquiryRouter = require('./src/routes/Inquiry');
+const reportRouter = require('./src/routes/report');
+const settingRouter = require('./src/routes/setting');
 
 
 const app = express();
@@ -35,6 +38,9 @@ app.use ("/order",orderRouter)
 app.use("/service", serviceRouter)
 app.use("/category", categoryRouter)
 app.use("/subcategory", subcategoryRouter)
+app.use("/inquiry", inquiryRouter)
+app.use("/report", reportRouter)
+app.use("/setting", settingRouter)
 
 
 app.listen(PORT, () => {
