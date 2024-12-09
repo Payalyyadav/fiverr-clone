@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 
 const OrderSchema = new mongoose.Schema(
     {
-        status: {
-            type: String,
-            required: true,
-            default: "in progress"
-        },
+        status: { type: String, enum: ['pending', 'completed', 'disputed', "in progress"], default: "in progress" },
+
+        disputeDetails: { type: String },
+
+        adminAction: { type: String },
+
+        amount: { type: Number, required: true },
 
         gig_id: {
             type: mongoose.Schema.Types.ObjectId,

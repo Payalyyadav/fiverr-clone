@@ -48,7 +48,27 @@ const inquiryCreate = async (req, res) => {
 
 }
 
+const statusUpdate = async (req, res) => {
+
+    const { status, inquiryId } = req.body;
+
+    const inquiry = await Inquiry.findById(inquiryId);
+
+    if (inquiry) {
+        inquiry.status = status;
+        inquiry.save();
+        return res.json({
+            message: `Inquiry  status updated successfully`,
+            status: inquiry.status,
+        });
+    } else {
+
+        throw new customError("Inquiry not found", 400);
+    }
+}
+
 
 executeTransaction(inquiryCreate);
+executeTransaction(statusUpdate);
 
-module.exports = { inquiryCreate };
+module.exports = { inquiryCreate, statusUpdate };

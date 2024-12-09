@@ -10,6 +10,7 @@ const subcategoryRouter = require('./src/routes/subcategory');
 const inquiryRouter = require('./src/routes/Inquiry');
 const reportRouter = require('./src/routes/report');
 const settingRouter = require('./src/routes/setting');
+const adminRouter = require('./src/routes/admin.route');
 
 
 const app = express();
@@ -41,6 +42,7 @@ app.use("/subcategory", subcategoryRouter)
 app.use("/inquiry", inquiryRouter)
 app.use("/report", reportRouter)
 app.use("/setting", settingRouter)
+app.use("/admin", adminRouter)
 
 
 app.listen(PORT, () => {

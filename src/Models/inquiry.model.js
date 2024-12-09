@@ -16,6 +16,11 @@ const InquirySchema = new mongoose.Schema(
         message: {
             type: String,
             required: true
+        },
+
+        status : {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -27,3 +32,4 @@ const Inquiry = mongoose.model("inquiries", InquirySchema);
 
 module.exports = Inquiry;
 
+//  result 

@@ -1,5 +1,4 @@
 const { z } = require("zod");
-const mongoose = require("mongoose");
 const { executeTransaction } = require("../../utils/trycatchhandler");
 const customError = require("../../utils/error.handle");
 const Setting = require("../../Models/setting.model");

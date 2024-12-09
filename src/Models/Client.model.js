@@ -34,6 +34,12 @@ const ClientSchema = new mongoose.Schema(
                 ref: 'orders'
             }
         ],
+        
+        status: {
+            type: String,
+            enum: ['active', 'banned'],
+            default: 'active'
+        },
 
         token : {
             type: String

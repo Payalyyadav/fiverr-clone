@@ -27,7 +27,7 @@ const addOrder = async (req, res) => {
         throw new customError(validationResult.error.errors.map(err => err.message).join(", "), 400);
     }
 
-    const { quantity, client_id, gig_id } = req.body;
+    const { quantity, client_id, gig_id, amount } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(client_id)) {
 
@@ -45,6 +45,7 @@ const addOrder = async (req, res) => {
 
         quantity,
         gig_id,
+        amount,
         client_id
     });
 

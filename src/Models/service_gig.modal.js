@@ -46,6 +46,10 @@ const GigSchema = new mongoose.Schema(
             }
         ],
 
+        status: {
+            type: String
+        },
+
         delivery_date: {
             type: Number,
             required: true
